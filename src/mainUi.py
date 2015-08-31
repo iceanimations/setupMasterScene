@@ -57,6 +57,10 @@ class MainUi(Form, Base):
         self.startButton.clicked.connect(self.start)
         self.browseButton.clicked.connect(self.setShotsPath)
         
+        self.label.hide()
+        self.shotsPathBox.hide()
+        self.browseButton.hide()
+        
         self.setupWindow()
         
         appUsageApp.updateDatabase('setupMasterScene')
