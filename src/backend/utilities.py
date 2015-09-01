@@ -44,7 +44,7 @@ def createRedshiftAOVs():
     pc.setAttr("redshiftOptions.imageFilePrefix", "<Camera>/<RenderLayer>/<RenderLayer>_<AOV>/<RenderLayer>_<AOV>_", type="string")
     pc.setAttr("redshiftOptions.imageFormat", 1)
     pc.setAttr("defaultRenderGlobals.animation", 1)
-    pc.setAttr("defaultRenderGlobals.enableDefaultLight", 0)
+    #pc.setAttr("defaultRenderGlobals.enableDefaultLight", 0)
     
 def setResolution(res):
     pc.setAttr('defaultResolution.width', int(res[0]))

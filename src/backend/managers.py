@@ -66,8 +66,7 @@ class EnvManager(Manager):
         try:
             # create Redshift mesh parameter set
             if self.meshes:
-                #TODO: turn this feature on upon request and discuss it with Bilal. It is on for testing
-                utils.createRedshiftMeshParameterSet(self.meshes, 'Env_Smooth_Set')
+                utils.createRedshiftMeshParameterSet([], 'Env_Smooth_Set')
                 
                 #TODO: How to identify the lights?
                 #TODO: Put the identified lights in a group named env_lights
