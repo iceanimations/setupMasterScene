@@ -89,7 +89,7 @@ class EnvManager(Manager):
                     pc.editRenderLayerAdjustment(aov.enabled)
                     aov.enabled.set(0)
             # create env_occ layer
-            env_occ = pc.duplicate(env_layer, name='Env_Occ')[0]
+            env_occ = pc.duplicate(env_layer, name='Env_Occ', inputConnections=True)[0]
             pc.editRenderLayerGlobals(currentRenderLayer=env_occ)
             # create rsAmbient_occ and rsIncandescent
             rsIncandescent = imaya.createShadingNode('RedshiftIncandescent')
@@ -137,14 +137,15 @@ class CharManager(Manager):
                 self.setStatus('Warning: %s'%str(ex))
                 
     def createObjectIds(self):
+        pc.select(self.meshes)
         utils.createRedshiftAOVs()
         
     def createCharLayers(self):
         # override enable env_matte_set
         if env_layer:
-            char_layer = pc.duplicate(env_layer, name='Char')[0]
-            pc.editRenderLayerMembers(char_layer, self.meshes, noRecurse=True)
+            char_layer = pc.duplicate(env_layer, name='Char', inputConnections=True)[0]
             pc.editRenderLayerGlobals(currentRenderLayer=char_layer)
+            pc.editRenderLayerMembers(char_layer, self.meshes, noRecurse=True)
             if env_matte_set:
                 pc.editRenderLayerAdjustment(env_matte_set.matteEnable)
                 env_matte_set.matteEnable.set(1)
@@ -154,7 +155,8 @@ class CharManager(Manager):
                     pc.editRenderLayerAdjustment(aov.enabled)
                     aov.enabled.set(1)
             # create shadow layer
-            shadow_layer = pc.duplicate(char_layer, name='Shadow')[0]
+            shadow_layer = pc.duplicate(char_layer, name='Shadow', inputConnections=True)[0]
+            pc.editRenderLayerGlobals(currentRenderLayer=shadow_layer)
             if self.char_visibility_set:
                 pc.editRenderLayerAdjustment(self.char_visibility_set.primaryRayVisible)
                 # turn the primary visibility off for the characters
@@ -174,10 +176,11 @@ class CharManager(Manager):
                 env_vis_set.shadowCaster.set(0)
             # turn all the aovs Off
             for aov in pc.ls(type=pc.nt.RedshiftAOV):
-                if aov.aovType.get() == 'Puzzle Matte':
-                    pc.editRenderLayerAdjustment(aov.enabled)
-                    aov.enabled.set(0)
-            contact_layer = pc.duplicate(shadow_layer, name='ContactShadow')[0]
+                pc.editRenderLayerAdjustment(aov.enabled)
+                aov.enabled.set(0)
+            # create the contact shadow layer
+            contact_layer = pc.duplicate(shadow_layer, name='ContactShadow', inputConnections=True)[0]
+            pc.editRenderLayerGlobals(currentRenderLayer=contact_layer)
             # disable the env_matte for contact shadow
             if env_matte_set:
                 pc.editRenderLayerAdjustment(env_matte_set.matteEnable)

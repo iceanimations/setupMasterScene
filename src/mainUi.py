@@ -145,8 +145,6 @@ class MainUi(Form, Base):
                 em = managers.EnvManager(self, env, env_lights)
                 self.setStatus('Creating Redshift Parameter Sets for environment')
                 em.setupParameterSets()
-                self.setStatus('Creating Environment layers')
-                em.createEnvLayers()
             if chars:
                 cm = managers.CharManager(self, chars)
                 self.setStatus('Creating Redshift Parameters Sets for characters')
@@ -155,6 +153,10 @@ class MainUi(Form, Base):
                 cm.createDeformedShapeNodes()
                 self.setStatus('Creating object and material IDs')
                 cm.createObjectIds()
+            if env:
+                self.setStatus('Creating Environment layers')
+                em.createEnvLayers()
+            if chars:
                 self.setStatus('Creating character layers')
                 cm.createCharLayers()
             if env:
