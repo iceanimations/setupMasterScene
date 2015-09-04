@@ -148,6 +148,8 @@ class CharManager(Manager):
             if env_matte_set:
                 pc.editRenderLayerAdjustment(env_matte_set.matteEnable)
                 env_matte_set.matteEnable.set(1)
+                pc.editRenderLayerAdjustment(env_matte_set.matteAlpha)
+                env_matte_set.matteAlpha.set(0)
             # turn puzzle matte aovs on
             for aov in pc.ls(type=pc.nt.RedshiftAOV):
                 if aov.aovType.get() == 'Puzzle Matte':
@@ -169,6 +171,8 @@ class CharManager(Manager):
                 env_matte_set.matteShadowEnable.set(1)
                 pc.editRenderLayerAdjustment(env_matte_set.matteShadowAffectsAlpha)
                 env_matte_set.matteShadowAffectsAlpha.set(1)
+                pc.editRenderLayerAdjustment(env_matte_set.matteAlpha)
+                env_matte_set.matteAlpha.set(1)
             # turn cast shadows off
             if env_vis_set:
                 pc.editRenderLayerAdjustment(env_vis_set.shadowCaster)
@@ -183,7 +187,7 @@ class CharManager(Manager):
             # disable the env_matte for contact shadow
             if env_matte_set:
                 pc.editRenderLayerAdjustment(env_matte_set.matteEnable)
-                env_matte_set.matteEnable.set(0)
+                env_matte_set.matteEnable.set(1)
             if env_vis_set:
                 pc.editRenderLayerAdjustment(env_vis_set.aoCaster)
                 env_vis_set.aoCaster.set(0)
