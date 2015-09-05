@@ -187,7 +187,7 @@ class CharManager(Manager):
             # disable the env_matte for contact shadow
             if env_matte_set:
                 pc.editRenderLayerAdjustment(env_matte_set.matteEnable)
-                env_matte_set.matteEnable.set(1)
+                env_matte_set.matteEnable.set(0)
             if env_vis_set:
                 pc.editRenderLayerAdjustment(env_vis_set.aoCaster)
                 env_vis_set.aoCaster.set(0)
