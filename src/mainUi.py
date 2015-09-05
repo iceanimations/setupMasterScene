@@ -124,7 +124,7 @@ class MainUi(Form, Base):
             self.statusBox.clear()
             env = self.getGroup('environment')
             if not env:
-                btn = self.showMessage(msg='Could not find Environment group',
+                btn = self.showMessage(msg='Could not find \"environment\" group',
                                        ques='Do you want to continue?',
                                        icon=QMessageBox.Question,
                                        btns=QMessageBox.Yes|QMessageBox.No)
@@ -132,21 +132,37 @@ class MainUi(Form, Base):
                     return
             chars = self.getGroup('characters')
             if not chars:
-                btn = self.showMessage(msg='Could not find Characters group',
+                btn = self.showMessage(msg='Could not find \"characters\" group',
                                        ques='Do you want to continue?',
                                        icon=QMessageBox.Question,
                                        btns=QMessageBox.Yes|QMessageBox.No)
                 if btn == QMessageBox.No:
                     return
             env_lights = self.getGroup('env_lights')
+            if not env_lights:
+                btn = self.showMessage(msg='Could not find \"env_lights\" group',
+                                       ques='Do you want to continue?',
+                                       icon=QMessageBox.Question,
+                                       btns=QMessageBox.Yes|QMessageBox.No)
+                if btn == QMessageBox.No:
+                    return
+            char_lights = self.getGroup('char_lights')
+            if not char_lights:
+                btn = self.showMessage(msg='Could not find \"char_lights\" group',
+                                       ques='Do you want to continue?',
+                                       icon=QMessageBox.Question,
+                                       btns=QMessageBox.Yes|QMessageBox.No)
+                if btn == QMessageBox.No:
+                    return
             if not env_lights: env_lights = None
+            if not char_lights: char_lights = None
             imaya.switchToMasterLayer()
             if env:
-                em = managers.EnvManager(self, env, env_lights)
+                em = managers.EnvManager(self, env, env_lights, char_lights)
                 self.setStatus('Creating Redshift Parameter Sets for environment')
                 em.setupParameterSets()
             if chars:
-                cm = managers.CharManager(self, chars)
+                cm = managers.CharManager(self, chars, char_lights, env_lights)
                 self.setStatus('Creating Redshift Parameters Sets for characters')
                 cm.setupParameterSets()
                 self.setStatus('Applying orbitrary cache to generate DeformedShape nodes')

@@ -47,11 +47,15 @@ class Manager(object):
             self.setStatus('Warning: Shape node not found for %s mesh%s'%(len(badMeshes), s))
             
 class EnvManager(Manager):
-    def __init__(self, parent=None, envGroup=None, envLights=None):
+    def __init__(self, parent=None, envGroup=None, envLights=None, charLights=None):
         super(EnvManager, self).__init__(parent, envGroup)
         
         self.lightsGroup = envLights
         self.envLights = []
+        self.charLights = []
+        if charLights:
+            for light in charLights.getChildren():
+                self.charLights.append(light)
         
         self.setEnvLights()
         
@@ -82,6 +86,10 @@ class EnvManager(Manager):
         if self.meshes or self.envLights:
             # create env layer
             env_layer = pc.createRenderLayer(self.meshes + self.envLights, name="Env", noRecurse=True, makeCurrent=True)
+            # hide char lights
+            if self.charLights:
+                pc.select(self.charLights[0].firstParent())
+                pc.mel.HideSelectedObjects()
             # turn char related aovs off
             for aov in pc.ls(type=pc.nt.RedshiftAOV):
                 if aov.aovType.get() == 'Puzzle Matte':
@@ -113,10 +121,24 @@ class EnvManager(Manager):
             aov.enabled.set(0)
 
 class CharManager(Manager):
-    def __init__(self, parent=None, charGroup=None):
+    def __init__(self, parent=None, charGroup=None, char_lights=None, env_lights=None):
         super(CharManager, self).__init__(parent, charGroup)
         
         self.char_visibility_set = None
+        
+        self.lightsGroup = char_lights
+        self.charLights = []
+        self.envLights = []
+        if env_lights:
+            for light in env_lights.getChildren():
+                self.envLights.append(light)
+        
+        self.setCharLights()
+        
+    def setCharLights(self):
+        if self.lightsGroup:
+            for light in self.lightsGroup.getChildren():
+                self.charLights.append(light)
                 
     def setupParameterSets(self):
         try:
@@ -144,6 +166,10 @@ class CharManager(Manager):
         if env_layer:
             char_layer = pc.duplicate(env_layer, name='Char', inputConnections=True)[0]
             pc.editRenderLayerGlobals(currentRenderLayer=char_layer)
+            # show charLights which was hidden in env and env_occ layers
+            if self.charLights:
+                pc.select(self.charLights[0].firstParent())
+                pc.mel.ShowSelectedObjects()
             pc.editRenderLayerMembers(char_layer, self.meshes, noRecurse=True)
             if env_matte_set:
                 pc.editRenderLayerAdjustment(env_matte_set.matteEnable)
@@ -184,6 +210,13 @@ class CharManager(Manager):
             # create the contact shadow layer
             contact_layer = pc.duplicate(shadow_layer, name='ContactShadow', inputConnections=True)[0]
             pc.editRenderLayerGlobals(currentRenderLayer=contact_layer)
+            # hide env and char lights
+            if self.charLights:
+                pc.select(self.charLights[0].firstParent())
+                pc.mel.HideSelectedObjects()
+            if self.envLights:
+                pc.select(self.envLights[0].firstParent())
+                pc.mel.HideSelectedObjects()
             # disable the env_matte for contact shadow
             if env_matte_set:
                 pc.editRenderLayerAdjustment(env_matte_set.matteEnable)
