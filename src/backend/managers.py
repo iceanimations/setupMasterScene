@@ -45,6 +45,8 @@ class Manager(object):
         if badMeshes:
             s = 'es' if len(badMeshes) > 1 else ''
             self.setStatus('Warning: Shape node not found for %s mesh%s'%(len(badMeshes), s))
+            for i, mesh in enumerate(badMeshes):
+                self.setStatus('%s: %s'%(i+1, mesh.name()))
             
 class EnvManager(Manager):
     def __init__(self, parent=None, envGroup=None, envLights=None, charLights=None):
