@@ -56,6 +56,7 @@ class MainUi(Form, Base):
         self.resolutionBox.activated.connect(self.resolutionBoxActivated)
         self.startButton.clicked.connect(self.start)
         self.browseButton.clicked.connect(self.setShotsPath)
+        self.addAssetsButton.clicked.connect(self.addAssets)
         
         self.label.hide()
         self.shotsPathBox.hide()
@@ -64,6 +65,11 @@ class MainUi(Form, Base):
         self.setupWindow()
         
         appUsageApp.updateDatabase('setupMasterScene')
+        
+    def addAssets(self):
+        import addAssets
+        reload(addAssets)
+        addAssets.Window(self).show()
         
     def resolutionBoxActivated(self):
         qutil.addOptionVar(resolution_key, self.resolutionBox.currentText())

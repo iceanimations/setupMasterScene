@@ -73,10 +73,6 @@ class EnvManager(Manager):
             # create Redshift mesh parameter set
             if self.meshes:
                 utils.createRedshiftMeshParameterSet([], 'Env_Smooth_Set')
-                
-                #TODO: How to identify the lights?
-                #TODO: Put the identified lights in a group named env_lights
-                
                 env_matte_set = utils.createRedshiftMatteParameterSet(self.meshes, 'Env_Matte_Set')
                 env_vis_set = utils.createRedshiftVisibilityParameterSet(self.meshes, 'Env_Vis_Set')
         except Exception as ex:
