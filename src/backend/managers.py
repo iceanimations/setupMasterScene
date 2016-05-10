@@ -30,9 +30,18 @@ class Manager(object):
         if self.parentWin:
             self.parentWin.setStatus(msg)
             
+    def getMeshes(self, grp):
+        meshes = []
+        for child in grp.getChildren():
+            if child.getShape(ni=True):
+                meshes.append(child)
+            else:
+                meshes.extend(self.getMeshes(child))
+        return meshes
+            
     def setMeshes(self):
         self.setStatus('Extracting %s meshes'%self.group.name().capitalize())
-        meshes = self.group.getChildren()
+        meshes = self.getMeshes(self.group)
         badMeshes = []
         for mesh in meshes:
             if type(mesh) == pc.nt.Transform:
