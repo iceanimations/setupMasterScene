@@ -33,8 +33,11 @@ class Manager(object):
     def getMeshes(self, grp):
         meshes = []
         for child in grp.getChildren():
-            if child.getShape(ni=True):
-                meshes.append(child)
+            try:
+                if child.getShape(ni=True):
+                    meshes.append(child)
+            except AttributeError:
+                pass
             else:
                 meshes.extend(self.getMeshes(child))
         return meshes
@@ -45,7 +48,10 @@ class Manager(object):
         badMeshes = []
         for mesh in meshes:
             if type(mesh) == pc.nt.Transform:
-                meshShape = mesh.getShape(ni=True)
+                try:
+                    meshShape = mesh.getShape(ni=True)
+                except AttributeError:
+                    continue
                 if not meshShape:
                     meshShape = pc.ls(mesh, type='mesh', dag=True)
                     if not meshShape:
