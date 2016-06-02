@@ -56,3 +56,9 @@ def turnMasterLayerOff():
         if layer.name().lower().startswith('default'):
             layer.renderable.set(0)
             break
+        
+def turnGIOff():
+    pc.editRenderLayerAdjustment("redshiftOptions.primaryGIEngine")
+    pc.editRenderLayerAdjustment("redshiftOptions.secondaryGIEngine")
+    pc.setAttr("redshiftOptions.primaryGIEngine", 0)
+    pc.setAttr("redshiftOptions.secondaryGIEngine", 0)

@@ -124,6 +124,8 @@ class EnvManager(Manager):
                 for aov in pc.ls(type=pc.nt.RedshiftAOV):
                     pc.editRenderLayerAdjustment(aov.enabled)
                     aov.enabled.set(0)
+                utils.turnGIOff()
+                
                 
     def createMtlOverride(self):
         # create material override for env meshes on contact shadow to assing AO_Shader
@@ -221,6 +223,7 @@ class CharManager(Manager):
             for aov in pc.ls(type=pc.nt.RedshiftAOV):
                 pc.editRenderLayerAdjustment(aov.enabled)
                 aov.enabled.set(0)
+            utils.turnGIOff()
             # create the Occ layer
             if self.parentWin.isOcc():
                 occ_layer = pc.duplicate(shadow_layer, name='Occ', inputConnections=True)[0]
@@ -241,6 +244,7 @@ class CharManager(Manager):
                 pc.editRenderLayerAdjustment("redshiftOptions.lightSamplesOverrideReplace")
                 pc.setAttr("redshiftOptions.lightSamplesOverrideReplace", 512)
                 pc.select(sl)
+                utils.turnGIOff()
             # create the contact shadow layer
             if self.parentWin.isContactShadow():
                 contact_layer = pc.duplicate(shadow_layer, name='ContactShadow', inputConnections=True)[0]
@@ -259,3 +263,4 @@ class CharManager(Manager):
                 if env_vis_set:
                     pc.editRenderLayerAdjustment(env_vis_set.aoCaster)
                     env_vis_set.aoCaster.set(0)
+                utils.turnGIOff()
