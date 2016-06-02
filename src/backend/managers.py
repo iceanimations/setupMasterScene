@@ -109,20 +109,21 @@ class EnvManager(Manager):
                     pc.editRenderLayerAdjustment(aov.enabled)
                     aov.enabled.set(0)
             # create env_occ layer
-            env_occ = pc.duplicate(env_layer, name='Env_Occ', inputConnections=True)[0]
-            pc.editRenderLayerGlobals(currentRenderLayer=env_occ)
-            # create rsAmbient_occ and rsIncandescent
-            rsIncandescent = imaya.createShadingNode('RedshiftIncandescent')
-            rsAmbientOcc = pc.shadingNode("RedshiftAmbientOcclusion", asShader=True)
-            rsAmbientOcc.outColor.connect(rsIncandescent.color, f=True)
-            rsAmbientOcc.maxDistance.set(15)
-            rsAmbientOcc.numSamples.set(64)
-            pc.rename(rsIncandescent, 'AO_Shader')
-            pc.mel.hookShaderOverride(env_occ, "", rsIncandescent)
-            # turn off all the aovs
-            for aov in pc.ls(type=pc.nt.RedshiftAOV):
-                pc.editRenderLayerAdjustment(aov.enabled)
-                aov.enabled.set(0)
+            if self.parentWin.isEnvOcc():
+                env_occ = pc.duplicate(env_layer, name='Env_Occ', inputConnections=True)[0]
+                pc.editRenderLayerGlobals(currentRenderLayer=env_occ)
+                # create rsAmbient_occ and rsIncandescent
+                rsIncandescent = imaya.createShadingNode('RedshiftIncandescent')
+                rsAmbientOcc = pc.shadingNode("RedshiftAmbientOcclusion", asShader=True)
+                rsAmbientOcc.outColor.connect(rsIncandescent.color, f=True)
+                rsAmbientOcc.maxDistance.set(15)
+                rsAmbientOcc.numSamples.set(64)
+                pc.rename(rsIncandescent, 'AO_Shader')
+                pc.mel.hookShaderOverride(env_occ, "", rsIncandescent)
+                # turn off all the aovs
+                for aov in pc.ls(type=pc.nt.RedshiftAOV):
+                    pc.editRenderLayerAdjustment(aov.enabled)
+                    aov.enabled.set(0)
                 
     def createMtlOverride(self):
         # create material override for env meshes on contact shadow to assing AO_Shader
@@ -220,20 +221,41 @@ class CharManager(Manager):
             for aov in pc.ls(type=pc.nt.RedshiftAOV):
                 pc.editRenderLayerAdjustment(aov.enabled)
                 aov.enabled.set(0)
+            # create the Occ layer
+            if self.parentWin.isOcc():
+                occ_layer = pc.duplicate(shadow_layer, name='Occ', inputConnections=True)[0]
+                pc.editRenderLayerGlobals(currentRenderLayer=occ_layer)
+                if self.envLights:
+                    pc.select(self.envLights[0].firstParent())
+                    pc.mel.HideSelectedObjects()
+                sl = pc.ls(sl=True)
+                pc.select(cl=True)
+                pc.mel.redshiftCreateDomeLight()
+                domeLight = pc.ls(sl=True)[0]
+                domeLight.on.set(0)
+                pc.editRenderLayerAdjustment(domeLight.on)
+                domeLight.on.set(1)
+                domeLight.background_enable.set(0)
+                pc.editRenderLayerAdjustment("redshiftOptions.lightSamplesOverrideEnable")
+                pc.setAttr("redshiftOptions.lightSamplesOverrideEnable", 1)
+                pc.editRenderLayerAdjustment("redshiftOptions.lightSamplesOverrideReplace")
+                pc.setAttr("redshiftOptions.lightSamplesOverrideReplace", 512)
+                pc.select(sl)
             # create the contact shadow layer
-            contact_layer = pc.duplicate(shadow_layer, name='ContactShadow', inputConnections=True)[0]
-            pc.editRenderLayerGlobals(currentRenderLayer=contact_layer)
-            # hide env and char lights
-            if self.charLights:
-                pc.select(self.charLights[0].firstParent())
-                pc.mel.HideSelectedObjects()
-            if self.envLights:
-                pc.select(self.envLights[0].firstParent())
-                pc.mel.HideSelectedObjects()
-            # disable the env_matte for contact shadow
-            if env_matte_set:
-                pc.editRenderLayerAdjustment(env_matte_set.matteEnable)
-                env_matte_set.matteEnable.set(0)
-            if env_vis_set:
-                pc.editRenderLayerAdjustment(env_vis_set.aoCaster)
-                env_vis_set.aoCaster.set(0)
+            if self.parentWin.isContactShadow():
+                contact_layer = pc.duplicate(shadow_layer, name='ContactShadow', inputConnections=True)[0]
+                pc.editRenderLayerGlobals(currentRenderLayer=contact_layer)
+                # hide env and char lights
+                if self.charLights:
+                    pc.select(self.charLights[0].firstParent())
+                    pc.mel.HideSelectedObjects()
+                if self.envLights:
+                    pc.select(self.envLights[0].firstParent())
+                    pc.mel.HideSelectedObjects()
+                # disable the env_matte for contact shadow
+                if env_matte_set:
+                    pc.editRenderLayerAdjustment(env_matte_set.matteEnable)
+                    env_matte_set.matteEnable.set(0)
+                if env_vis_set:
+                    pc.editRenderLayerAdjustment(env_vis_set.aoCaster)
+                    env_vis_set.aoCaster.set(0)

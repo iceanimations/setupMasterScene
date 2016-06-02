@@ -57,7 +57,7 @@
          <string>Add assets from TACTIC for the specified Sequence</string>
         </property>
         <property name="text">
-         <string>Add Assets</string>
+         <string>Sequence Assets</string>
         </property>
        </widget>
       </item>
@@ -85,6 +85,39 @@
        <widget class="QComboBox" name="resolutionBox"/>
       </item>
       <item>
+       <widget class="QCheckBox" name="contactShadowButton">
+        <property name="toolTip">
+         <string>Create ContactShadow layer from shadow layer</string>
+        </property>
+        <property name="text">
+         <string>Contact Shadow</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="envOccButton">
+        <property name="toolTip">
+         <string>Create Env_Occ layer from Env layer</string>
+        </property>
+        <property name="text">
+         <string>Env Occ</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="occButton">
+        <property name="toolTip">
+         <string>Create Occ layer from Shadow layer</string>
+        </property>
+        <property name="text">
+         <string>Occ</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QPushButton" name="startButton">
         <property name="minimumSize">
          <size>
@@ -106,7 +139,7 @@
          </size>
         </property>
         <property name="text">
-         <string>Cancel</string>
+         <string>Close</string>
         </property>
        </widget>
       </item>

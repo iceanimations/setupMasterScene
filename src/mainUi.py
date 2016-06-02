@@ -27,6 +27,10 @@ import appUsageApp
 reload(appUsageApp)
 from collections import OrderedDict
 
+import login
+reload(login)
+import auth.user as user
+
 pathKey = 'setupMasterScene_shotsPathKey'
 resolution_key = 'setupMasterScene_resolutionKey'
 uiPath = osp.join(qutil.dirname(__file__, 2), 'ui')
@@ -66,7 +70,19 @@ class MainUi(Form, Base):
         
         appUsageApp.updateDatabase('setupMasterScene')
         
+    def isEnvOcc(self):
+        return self.envOccButton.isChecked()
+    
+    def isContactShadow(self):
+        return self.contactShadowButton.isChecked()
+    
+    def isOcc(self):
+        return self.occButton.isChecked()
+        
     def addAssets(self):
+        if not user.user_registered():
+            if not login.Dialog().exec_():
+                return
         import addAssets
         reload(addAssets)
         addAssets.Window(self).show()
