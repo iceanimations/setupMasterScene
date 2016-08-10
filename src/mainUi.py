@@ -26,6 +26,7 @@ reload(imaya)
 import appUsageApp
 reload(appUsageApp)
 from collections import OrderedDict
+import pymel.core as pc
 
 import login
 reload(login)
@@ -139,7 +140,7 @@ class MainUi(Form, Base):
                     return
         else:
             return
-        return group[0]
+        return pc.PyNode(group[0])
     
     def start(self):
         try:
