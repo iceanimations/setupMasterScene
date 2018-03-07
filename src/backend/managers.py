@@ -141,6 +141,8 @@ class CharManager(Manager):
         super(CharManager, self).__init__(parent, charGroup)
         
         self.char_visibility_set = None
+        self.char_matte_set = None
+        self.char_layer = None
         
         self.lightsGroup = char_lights
         self.charLights = []
@@ -159,7 +161,7 @@ class CharManager(Manager):
     def setupParameterSets(self):
         try:
             utils.createRedshiftMeshParameterSet(self.meshes, 'Char_Smooth_Set')
-            utils.createRedshiftMatteParameterSet(self.meshes, 'Char_Matte_Set')
+            self.char_matte_set = utils.createRedshiftMatteParameterSet(self.meshes, 'Char_Matte_Set')
             self.char_visibility_set = utils.createRedshiftVisibilityParameterSet(self.meshes, 'Char_Vis_Set')
         except Exception as ex:
             self.setStatus('Warning: '+str(ex))
@@ -180,13 +182,13 @@ class CharManager(Manager):
     def createCharLayers(self):
         # override enable env_matte_set
         if env_layer:
-            char_layer = pc.duplicate(env_layer, name='Char', inputConnections=True)[0]
-            pc.editRenderLayerGlobals(currentRenderLayer=char_layer)
+            self.char_layer = pc.duplicate(env_layer, name='Char', inputConnections=True)[0]
+            pc.editRenderLayerGlobals(currentRenderLayer=self.char_layer)
             # show charLights which was hidden in env and env_occ layers
             if self.charLights:
                 pc.select(self.charLights[0].firstParent())
                 pc.mel.ShowSelectedObjects()
-            pc.editRenderLayerMembers(char_layer, self.meshes, noRecurse=True)
+            pc.editRenderLayerMembers(self.char_layer, self.meshes, noRecurse=True)
             if env_matte_set:
                 pc.editRenderLayerAdjustment(env_matte_set.matteEnable)
                 env_matte_set.matteEnable.set(1)
@@ -198,7 +200,7 @@ class CharManager(Manager):
                     pc.editRenderLayerAdjustment(aov.enabled)
                     aov.enabled.set(1)
             # create shadow layer
-            shadow_layer = pc.duplicate(char_layer, name='Shadow', inputConnections=True)[0]
+            shadow_layer = pc.duplicate(self.char_layer, name='Shadow', inputConnections=True)[0]
             pc.editRenderLayerGlobals(currentRenderLayer=shadow_layer)
             if self.char_visibility_set:
                 pc.editRenderLayerAdjustment(self.char_visibility_set.primaryRayVisible)
@@ -264,3 +266,24 @@ class CharManager(Manager):
                     pc.editRenderLayerAdjustment(env_vis_set.aoCaster)
                     env_vis_set.aoCaster.set(0)
                 utils.turnGIOff()
+
+    def customFeature_SuntopFresnel(self):
+        try:
+            suntop, fresnel = pc.ls(sl=True)
+            # duplicate the char layer
+            if self.char_layer:
+                suntop_fresnel_layer = pc.duplicate(self.char_layer, name='Suntop_Fresnel', inputConnections=True)[0]
+                pc.editRenderLayerGlobals(currentRenderLayer=suntop_fresnel_layer)
+                self.char_matte_set.matteEnable.set(0)
+                pc.editRenderLayerAdjustment(self.char_matte_set.matteEnable)
+                self.char_matte_set.matteEnable.set(1)
+                self.char_matte_set.matteAlpha.set(0)
+                pc.editRenderLayerMembers(suntop_fresnel_layer, fresnel, noRecurse=True)
+                pc.select(suntop); pc.mel.HideSelectedObjects()
+                pc.select(fresnel); pc.mel.HideSelectedObjects() # overrides the attr
+                pc.select(fresnel); pc.mel.ShowSelectedObjects()
+        except ValueError:
+            self.setStatus('Warning: Select two objects only')
+        except Exception as ex:
+            self.setStatus('Warning: %s'%str(ex))
+            

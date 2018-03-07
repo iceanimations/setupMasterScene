@@ -50,6 +50,8 @@ class MainUi(Form, Base):
             self.shotsPathBox.setText(path)
         else:
             self.lastPath = ''
+            
+        self.cm = None
         
         self.resolutions = OrderedDict()
         self.resolutions['320x240'] = [320, 240, 1.333]
@@ -62,6 +64,7 @@ class MainUi(Form, Base):
         self.startButton.clicked.connect(self.start)
         self.browseButton.clicked.connect(self.setShotsPath)
         self.addAssetsButton.clicked.connect(self.addAssets)
+        self.fresnelButton.clicked.connect(self.customFeature_suntopFresnel)
         
         self.label.hide()
         self.shotsPathBox.hide()
@@ -173,19 +176,19 @@ class MainUi(Form, Base):
                         self.setStatus('Creating Redshift Parameter Sets for environment')
                         em.setupParameterSets()
                     if chars:
-                        cm = managers.CharManager(self, chars, char_lights, env_lights)
+                        self.cm = managers.CharManager(self, chars, char_lights, env_lights)
                         self.setStatus('Creating Redshift Parameters Sets for characters')
-                        cm.setupParameterSets()
+                        self.cm.setupParameterSets()
                         self.setStatus('Applying orbitrary cache to generate DeformedShape nodes')
-                        cm.createDeformedShapeNodes()
+                        self.cm.createDeformedShapeNodes()
                         self.setStatus('Creating object and material IDs')
-                        cm.createObjectIds()
+                        self.cm.createObjectIds()
                     if env:
                         self.setStatus('Creating Environment layers')
                         em.createEnvLayers()
                     if chars:
                         self.setStatus('Creating character layers')
-                        cm.createCharLayers()
+                        self.cm.createCharLayers()
                     if env:
                         self.setStatus('Creating material override for environment on Contact shadow layer')
                         em.createMtlOverride()
@@ -196,3 +199,12 @@ class MainUi(Form, Base):
             self.showMessage(msg=str(ex), icon=QMessageBox.Critical)
         finally:
             self.setStatus('')
+            
+    def customFeature_suntopFresnel(self):
+        if self.cm:
+            self.setStatus('Creating suntop_fresnel layer')
+            self.cm.customFeature_SuntopFresnel()
+            self.setStatus('DONE...')
+        else:
+            self.showMessage(msg='This feature will only work right after creating other layers, without closing \'Setup Master Scene\'',
+                             icon=QMessageBox.Information)

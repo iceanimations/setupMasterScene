@@ -62,6 +62,16 @@
        </widget>
       </item>
       <item>
+       <widget class="QPushButton" name="fresnelButton">
+        <property name="toolTip">
+         <string>Select Suntop regular and Suntop fresnel respectively and press to create suntop_fresnel layer</string>
+        </property>
+        <property name="text">
+         <string>Fresnel</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <spacer name="horizontalSpacer">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
