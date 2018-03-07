@@ -144,63 +144,54 @@ class MainUi(Form, Base):
     
     def start(self):
         try:
+            groupNames = []
             self.statusBox.clear()
             env = self.getGroup('environment')
             if not env:
-                btn = self.showMessage(msg='Could not find \"environment\" group',
-                                       icon=QMessageBox.Critical)
-                return
+                groupNames.append('environment')
             chars = self.getGroup('characters')
             if not chars:
-                btn = self.showMessage(msg='Could not find \"characters\" group',
-                                       ques='Do you want to continue?',
-                                       icon=QMessageBox.Question,
-                                       btns=QMessageBox.Yes|QMessageBox.No)
-                if btn == QMessageBox.No:
-                    return
+                groupNames.append('characters')
             env_lights = self.getGroup('env_lights')
             if not env_lights:
-                btn = self.showMessage(msg='Could not find \"env_lights\" group',
-                                       ques='Do you want to continue?',
-                                       icon=QMessageBox.Question,
-                                       btns=QMessageBox.Yes|QMessageBox.No)
-                if btn == QMessageBox.No:
-                    return
+                groupNames.append('Env_lights')
             char_lights = self.getGroup('char_lights')
             if not char_lights:
-                btn = self.showMessage(msg='Could not find \"char_lights\" group',
+                groupNames.append('char_lights')
+            if groupNames:
+                btn = self.showMessage(msg='Could not find following groups\n'+
+                                       ', '.join(groupNames),
                                        ques='Do you want to continue?',
                                        icon=QMessageBox.Question,
                                        btns=QMessageBox.Yes|QMessageBox.No)
-                if btn == QMessageBox.No:
-                    return
-            if not env_lights: env_lights = None
-            if not char_lights: char_lights = None
-            imaya.switchToMasterLayer()
-            if env:
-                em = managers.EnvManager(self, env, env_lights, char_lights)
-                self.setStatus('Creating Redshift Parameter Sets for environment')
-                em.setupParameterSets()
-            if chars:
-                cm = managers.CharManager(self, chars, char_lights, env_lights)
-                self.setStatus('Creating Redshift Parameters Sets for characters')
-                cm.setupParameterSets()
-                self.setStatus('Applying orbitrary cache to generate DeformedShape nodes')
-                cm.createDeformedShapeNodes()
-                self.setStatus('Creating object and material IDs')
-                cm.createObjectIds()
-            if env:
-                self.setStatus('Creating Environment layers')
-                em.createEnvLayers()
-            if chars:
-                self.setStatus('Creating character layers')
-                cm.createCharLayers()
-            if env:
-                self.setStatus('Creating material override for environment on Contact shadow layer')
-                em.createMtlOverride()
-            utils.setResolution(self.getResolution())
-            utils.turnMasterLayerOff()
-            self.setStatus('DONE...')
+                if btn == QMessageBox.Yes:
+                    if not env_lights: env_lights = None
+                    if not char_lights: char_lights = None
+                    imaya.switchToMasterLayer()
+                    if env:
+                        em = managers.EnvManager(self, env, env_lights, char_lights)
+                        self.setStatus('Creating Redshift Parameter Sets for environment')
+                        em.setupParameterSets()
+                    if chars:
+                        cm = managers.CharManager(self, chars, char_lights, env_lights)
+                        self.setStatus('Creating Redshift Parameters Sets for characters')
+                        cm.setupParameterSets()
+                        self.setStatus('Applying orbitrary cache to generate DeformedShape nodes')
+                        cm.createDeformedShapeNodes()
+                        self.setStatus('Creating object and material IDs')
+                        cm.createObjectIds()
+                    if env:
+                        self.setStatus('Creating Environment layers')
+                        em.createEnvLayers()
+                    if chars:
+                        self.setStatus('Creating character layers')
+                        cm.createCharLayers()
+                    if env:
+                        self.setStatus('Creating material override for environment on Contact shadow layer')
+                        em.createMtlOverride()
+                    utils.setResolution(self.getResolution())
+                    utils.turnMasterLayerOff()
+                    self.setStatus('DONE...')
         except Exception as ex:
             self.showMessage(msg=str(ex), icon=QMessageBox.Critical)
         finally:
