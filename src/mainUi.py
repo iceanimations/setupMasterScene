@@ -145,34 +145,6 @@ class MainUi(Form, Base):
     def start(self):
         try:
             self.statusBox.clear()
-            geoSets = imaya.getGeoSets()
-            if geoSets:
-                geoLen = len(geoSets)
-                if geoLen > 1:
-                    s = 's'
-                    ss = 'them'
-                else:
-                    s = ''
-                    ss = 'it'
-                
-                btn = self.showMessage(msg='%s Geometry Set%s found in the current scene'%(geoLen, s),
-                                       ques='Do you want to combine and add %s to characters group?'%ss,
-                                       icon=QMessageBox.Question,
-                                       btns=QMessageBox.Yes|QMessageBox.No)
-                if btn == QMessageBox.Yes:
-                    sb = cui.SelectionBox(self, [QCheckBox(s.name(), self) for s in geoSets], msg='Select sets')
-                    sb.setCancelToolTip('Skip adding Geometry sets to characters group')
-                    if sb.exec_():
-                        geoSets = [pc.PyNode(s) for s in sb.getSelectedItems()]
-                        meshes = []
-                        for s in geoSets:
-                            mesh = imaya.getCombinedMeshFromSet(s)
-                            if not mesh:
-                                self.appendStatus('Warning: Could not combine %s'%s)
-                                continue
-                            meshes.append(mesh)
-                        if meshes:
-                            imaya.addMeshesToGroup(meshes, 'characters')
             env = self.getGroup('environment')
             if not env:
                 btn = self.showMessage(msg='Could not find \"environment\" group',
